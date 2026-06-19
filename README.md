@@ -11,8 +11,13 @@ DevTrack Pro lets users create projects, update their status, set priority, add 
 - Create, edit, and delete projects
 - Project status tracking: Planned, In Progress, Completed
 - Priority labels: Low, Medium, High
-- Optional due dates
-- Dashboard summary cards
+- Optional due dates with overdue and due-soon indicators
+- Dashboard summary cards including overdue count
+- Search projects by title or description
+- Filter by status and priority
+- Quick status updates from the project list
+- Dark mode with system preference support
+- Flash messages for auth and project actions
 - MongoDB-backed project storage
 - Production-ready environment variable setup
 
@@ -117,12 +122,10 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for the full deployment checklist.
 
 ## Future Ideas
 
-- Search and filter projects
 - Team collaboration
 - Project activity timeline
 - Kanban board view
 - File attachments
-- Dark mode
 
 ## Author
 

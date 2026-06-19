@@ -18,4 +18,10 @@ router.post(
 
 router.post("/project/edit/:id", authMiddleware, projectController.editProject);
 
+router.post(
+  "/project/status/:id",
+  authMiddleware,
+  projectController.quickUpdateStatus,
+);
+
 module.exports = router;

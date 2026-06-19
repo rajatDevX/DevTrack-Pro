@@ -13,6 +13,9 @@ In Render:
 - Language: Node
 - Build Command: `npm install`
 - Start Command: `npm start`
+- Health Check Path: `/health`
+
+The app requires Node.js `20.19.0` or newer. This is already declared in `package.json`.
 
 ## 3. Add environment variables
 
@@ -28,7 +31,13 @@ Do not add `PORT`; Render provides it automatically.
 
 ## 4. MongoDB Atlas network access
 
-In MongoDB Atlas, allow Render to connect. For a quick student/demo deployment, you can allow access from anywhere with `0.0.0.0/0`. For a production app, restrict this to trusted outbound IPs if your hosting plan provides them.
+In MongoDB Atlas, allow Render to connect:
+
+- Atlas > Network Access > Add IP Address
+- For a quick student/demo deployment, allow access from anywhere with `0.0.0.0/0`
+- For production, restrict this to trusted outbound IPs if your hosting plan provides them
+
+If Render logs show `querySrv`, `ECONNREFUSED`, `ENOTFOUND`, or authentication errors, re-check the `MONGO_URI`, Atlas database user password, and Network Access settings.
 
 ## 5. Deploy
 

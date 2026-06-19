@@ -1,311 +1,239 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 <head>
-    <title>Projects Dashboard</title>
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            color: #1f2933;
-            font-family: Arial, sans-serif;
-            margin: 40px auto;
-            max-width: 900px;
-            padding: 0 16px;
-        }
-
-        input,
-        textarea,
-        select {
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font: inherit;
-            padding: 10px;
-            width: 100%;
-        }
-
-        button,
-        .link-button {
-            border: 0;
-            border-radius: 6px;
-            cursor: pointer;
-            font: inherit;
-            padding: 10px 16px;
-        }
-
-        .primary-button {
-            background: #2563eb;
-            color: white;
-        }
-
-        .danger-button {
-            background: #dc2626;
-            color: white;
-        }
-
-        .dashboard-header {
-            align-items: center;
-            display: flex;
-            justify-content: space-between;
-            gap: 16px;
-        }
-
-        .stats-grid {
-            display: grid;
-            gap: 12px;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            margin: 20px 0 26px;
-        }
-
-        .stat-card {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 14px;
-        }
-
-        .stat-card strong {
-            display: block;
-            font-size: 28px;
-            margin-bottom: 4px;
-        }
-
-        .form-grid {
-            display: grid;
-            gap: 10px;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        }
-
-        .project-card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            padding: 15px;
-        }
-
-        .project-topline {
-            align-items: flex-start;
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-        }
-
-        .badge-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin: 8px 0 12px;
-        }
-
-        .badge {
-            background: #eef2ff;
-            border-radius: 999px;
-            color: #3730a3;
-            display: inline-flex;
-            font-size: 13px;
-            padding: 5px 10px;
-        }
-
-        .badge.priority-high {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .badge.status-completed {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .project-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 12px;
-        }
-
-        .edit-form {
-            display: grid;
-            gap: 10px;
-            margin-top: 14px;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | DevTrack Pro</title>
+    <link rel="stylesheet" href="/css/app.css">
+    <script src="/js/theme.js" defer></script>
 </head>
 <body>
 
+<div class="container">
 
-<div class="dashboard-header">
-    <h1>🚀 My Projects</h1>
-    <a href="/logout">Logout</a>
-</div>
-
-<section class="stats-grid">
-    <div class="stat-card">
-        <strong><%= stats.total %></strong>
-        <span>Total Projects</span>
+    <div class="dashboard-header">
+        <div>
+            <h1>My Projects</h1>
+            <p class="subtitle">Welcome back, <%= user.name || user.email %></p>
+        </div>
+        <div class="header-actions">
+            <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">🌙</button>
+            <a href="/logout" class="btn btn-secondary btn-sm">Logout</a>
+        </div>
     </div>
 
-    <div class="stat-card">
-        <strong><%= stats.inProgress %></strong>
-        <span>In Progress</span>
-    </div>
+    <% if (flash) { %>
+        <div class="alert alert-<%= flash.type %>"><%= flash.message %></div>
+    <% } %>
 
-    <div class="stat-card">
-        <strong><%= stats.completed %></strong>
-        <span>Completed</span>
-    </div>
+    <section class="stats-grid">
+        <div class="stat-card">
+            <strong><%= stats.total %></strong>
+            <span>Total</span>
+        </div>
+        <div class="stat-card">
+            <strong><%= stats.planned %></strong>
+            <span>Planned</span>
+        </div>
+        <div class="stat-card">
+            <strong><%= stats.inProgress %></strong>
+            <span>In Progress</span>
+        </div>
+        <div class="stat-card">
+            <strong><%= stats.completed %></strong>
+            <span>Completed</span>
+        </div>
+        <div class="stat-card">
+            <strong><%= stats.highPriority %></strong>
+            <span>High Priority</span>
+        </div>
+        <div class="stat-card">
+            <strong><%= stats.overdue %></strong>
+            <span>Overdue</span>
+        </div>
+    </section>
 
-    <div class="stat-card">
-        <strong><%= stats.highPriority %></strong>
-        <span>High Priority</span>
-    </div>
-</section>
-
-<hr>
-
-<h2>Create New Project</h2>
-
-<form method="POST" action="/project" style="margin-bottom:30px;">
-
-    <div style="margin-bottom:10px;">
-        <input
-            type="text"
-            name="title"
-            placeholder="Project Title"
-            required
-        >
-    </div>
-
-    <div style="margin-bottom:10px;">
-        <textarea
-            name="description"
-            placeholder="Project Description"
-            rows="4"
-            required
-        ></textarea>
-    </div>
-
-    <div class="form-grid" style="margin-bottom:10px;">
-        <select name="status">
-            <option value="Planned">Planned</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
-        </select>
-
-        <select name="priority">
-            <option value="Low">Low Priority</option>
-            <option value="Medium" selected>Medium Priority</option>
-            <option value="High">High Priority</option>
-        </select>
-
-        <input
-            type="date"
-            name="dueDate"
-        >
-    </div>
-
-    <button
-        type="submit"
-        class="primary-button"
-    >
-        Create Project
-    </button>
-
-</form>
-
-<hr>
-
-<h2>Project List</h2>
-
-<% if(projects.length === 0){ %>
-
-    <p>No projects found.</p>
-
-<% } else { %>
-
-    <% projects.forEach(project => { %>
-
-        <div class="project-card">
-
-            <div class="project-topline">
-                <h3><%= project.title %></h3>
-                <% if(project.dueDate){ %>
-                    <span class="badge">
-                        Due <%= project.dueDate.toISOString().slice(0, 10) %>
-                    </span>
-                <% } %>
-            </div>
-
-            <div class="badge-row">
-                <span class="badge <%= project.status === 'Completed' ? 'status-completed' : '' %>">
-                    <%= project.status || 'Planned' %>
-                </span>
-                <span class="badge <%= project.priority === 'High' ? 'priority-high' : '' %>">
-                    <%= project.priority || 'Medium' %> Priority
-                </span>
-            </div>
-
-            <p><%= project.description %></p>
-
-            <form
-                class="edit-form"
-                method="POST"
-                action="/project/edit/<%= project._id %>"
-            >
+    <section class="filter-bar">
+        <form method="GET" action="/dashboard">
+            <div class="filter-grid">
                 <input
-                    type="text"
-                    name="title"
-                    value="<%= project.title %>"
-                    required
+                    type="search"
+                    name="q"
+                    placeholder="Search by title or description..."
+                    value="<%= filters.q %>"
                 >
+                <select name="status">
+                    <option value="">All statuses</option>
+                    <option value="Planned" <%= filters.status === 'Planned' ? 'selected' : '' %>>Planned</option>
+                    <option value="In Progress" <%= filters.status === 'In Progress' ? 'selected' : '' %>>In Progress</option>
+                    <option value="Completed" <%= filters.status === 'Completed' ? 'selected' : '' %>>Completed</option>
+                </select>
+                <select name="priority">
+                    <option value="">All priorities</option>
+                    <option value="Low" <%= filters.priority === 'Low' ? 'selected' : '' %>>Low</option>
+                    <option value="Medium" <%= filters.priority === 'Medium' ? 'selected' : '' %>>Medium</option>
+                    <option value="High" <%= filters.priority === 'High' ? 'selected' : '' %>>High</option>
+                </select>
+                <button type="submit" class="btn">Filter</button>
+            </div>
+            <% if (filters.q || filters.status || filters.priority) { %>
+                <p style="margin: 12px 0 0;">
+                    <a href="/dashboard">Clear filters</a>
+                    &middot;
+                    <%= projects.length %> result<%= projects.length === 1 ? '' : 's' %>
+                </p>
+            <% } %>
+        </form>
+    </section>
 
-                <textarea
-                    name="description"
-                    rows="3"
-                    required
-                ><%= project.description %></textarea>
+    <h2 class="section-title">Create New Project</h2>
 
-                <div class="form-grid">
-                    <select name="status">
+    <div class="card" style="margin-bottom: 28px;">
+        <form method="POST" action="/project">
+            <div class="field">
+                <label for="new-title">Title</label>
+                <input type="text" id="new-title" name="title" placeholder="Project title" required>
+            </div>
+            <div class="field">
+                <label for="new-description">Description</label>
+                <textarea id="new-description" name="description" rows="3" placeholder="What are you building?" required></textarea>
+            </div>
+            <div class="form-grid">
+                <div class="field" style="margin-bottom: 0;">
+                    <label for="new-status">Status</label>
+                    <select id="new-status" name="status">
+                        <option value="Planned">Planned</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+                <div class="field" style="margin-bottom: 0;">
+                    <label for="new-priority">Priority</label>
+                    <select id="new-priority" name="priority">
+                        <option value="Low">Low</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="High">High</option>
+                    </select>
+                </div>
+                <div class="field" style="margin-bottom: 0;">
+                    <label for="new-due">Due date</label>
+                    <input type="date" id="new-due" name="dueDate">
+                </div>
+            </div>
+            <div class="project-actions">
+                <button type="submit" class="btn">Create Project</button>
+            </div>
+        </form>
+    </div>
+
+    <h2 class="section-title">Project List</h2>
+
+    <% if (projects.length === 0) { %>
+        <div class="empty-state card">
+            <% if (filters.q || filters.status || filters.priority) { %>
+                <p>No projects match your filters.</p>
+            <% } else { %>
+                <p>No projects yet. Create your first one above.</p>
+            <% } %>
+        </div>
+    <% } else { %>
+        <% projects.forEach(project => {
+            const isOverdue = project.dueDate && project.status !== 'Completed' && project.dueDate < now;
+            const isDueSoon = project.dueDate && project.status !== 'Completed' && !isOverdue && project.dueDate <= threeDaysFromNow;
+        %>
+            <article class="project-card">
+                <div class="project-topline">
+                    <h3><%= project.title %></h3>
+                    <div class="badge-row" style="margin: 0;">
+                        <% if (project.dueDate) { %>
+                            <% if (isOverdue) { %>
+                                <span class="badge overdue">Overdue <%= project.dueDate.toISOString().slice(0, 10) %></span>
+                            <% } else if (isDueSoon) { %>
+                                <span class="badge due-soon">Due soon <%= project.dueDate.toISOString().slice(0, 10) %></span>
+                            <% } else { %>
+                                <span class="badge">Due <%= project.dueDate.toISOString().slice(0, 10) %></span>
+                            <% } %>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div class="badge-row">
+                    <span class="badge <%= project.status === 'Completed' ? 'status-completed' : '' %>">
+                        <%= project.status || 'Planned' %>
+                    </span>
+                    <span class="badge <%= project.priority === 'High' ? 'priority-high' : '' %>">
+                        <%= project.priority || 'Medium' %> priority
+                    </span>
+                </div>
+
+                <p class="project-description"><%= project.description %></p>
+
+                <form method="POST" action="/project/status/<%= project._id %>" class="project-actions">
+                    <select name="status" aria-label="Quick status update">
                         <option value="Planned" <%= project.status === 'Planned' ? 'selected' : '' %>>Planned</option>
                         <option value="In Progress" <%= project.status === 'In Progress' ? 'selected' : '' %>>In Progress</option>
                         <option value="Completed" <%= project.status === 'Completed' ? 'selected' : '' %>>Completed</option>
                     </select>
+                    <button type="submit" class="btn btn-secondary btn-sm">Update status</button>
+                    <button type="button" class="btn btn-secondary btn-sm toggle-edit" data-target="edit-<%= project._id %>">
+                        Edit details
+                    </button>
+                </form>
 
-                    <select name="priority">
-                        <option value="Low" <%= project.priority === 'Low' ? 'selected' : '' %>>Low Priority</option>
-                        <option value="Medium" <%= project.priority === 'Medium' ? 'selected' : '' %>>Medium Priority</option>
-                        <option value="High" <%= project.priority === 'High' ? 'selected' : '' %>>High Priority</option>
-                    </select>
+                <form
+                    id="edit-<%= project._id %>"
+                    class="edit-form"
+                    method="POST"
+                    action="/project/edit/<%= project._id %>"
+                >
+                    <input type="text" name="title" value="<%= project.title %>" required>
+                    <textarea name="description" rows="3" required><%= project.description %></textarea>
+                    <div class="form-grid">
+                        <select name="status">
+                            <option value="Planned" <%= project.status === 'Planned' ? 'selected' : '' %>>Planned</option>
+                            <option value="In Progress" <%= project.status === 'In Progress' ? 'selected' : '' %>>In Progress</option>
+                            <option value="Completed" <%= project.status === 'Completed' ? 'selected' : '' %>>Completed</option>
+                        </select>
+                        <select name="priority">
+                            <option value="Low" <%= project.priority === 'Low' ? 'selected' : '' %>>Low</option>
+                            <option value="Medium" <%= project.priority === 'Medium' ? 'selected' : '' %>>Medium</option>
+                            <option value="High" <%= project.priority === 'High' ? 'selected' : '' %>>High</option>
+                        </select>
+                        <input
+                            type="date"
+                            name="dueDate"
+                            value="<%= project.dueDate ? project.dueDate.toISOString().slice(0, 10) : '' %>"
+                        >
+                    </div>
+                    <div class="project-actions">
+                        <button type="submit" class="btn">Save changes</button>
+                    </div>
+                </form>
 
-                    <input
-                        type="date"
-                        name="dueDate"
-                        value="<%= project.dueDate ? project.dueDate.toISOString().slice(0, 10) : '' %>"
-                    >
-                </div>
+                <form
+                    class="project-actions"
+                    method="POST"
+                    action="/project/delete/<%= project._id %>"
+                    onsubmit="return confirm('Delete this project?');"
+                >
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </article>
+        <% }) %>
+    <% } %>
 
-                <div class="project-actions">
-                    <button class="primary-button" type="submit">Update Project</button>
-                </div>
-            </form>
+</div>
 
-            <form
-                class="project-actions"
-                method="POST"
-                action="/project/delete/<%= project._id %>"
-                onsubmit="return confirm('Delete this project?');"
-            >
-                <button class="danger-button" type="submit">Delete Project</button>
-            </form>
-
-        </div>
-
-    <% }) %>
-
-<% } %>
-
+<script>
+    document.querySelectorAll(".toggle-edit").forEach(function (button) {
+        button.addEventListener("click", function () {
+            var form = document.getElementById(button.dataset.target);
+            if (!form) return;
+            form.classList.toggle("is-open");
+            button.textContent = form.classList.contains("is-open") ? "Hide edit" : "Edit details";
+        });
+    });
+</script>
 
 </body>
 </html>
