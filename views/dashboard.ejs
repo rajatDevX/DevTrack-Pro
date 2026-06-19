@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Projects Dashboard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            color: #1f2933;
+            font-family: Arial, sans-serif;
+            margin: 40px auto;
+            max-width: 900px;
+            padding: 0 16px;
+        }
+
+        input,
+        textarea,
+        select {
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font: inherit;
+            padding: 10px;
+            width: 100%;
+        }
+
+        button,
+        .link-button {
+            border: 0;
+            border-radius: 6px;
+            cursor: pointer;
+            font: inherit;
+            padding: 10px 16px;
+        }
+
+        .primary-button {
+            background: #2563eb;
+            color: white;
+        }
+
+        .danger-button {
+            background: #dc2626;
+            color: white;
+        }
+
+        .dashboard-header {
+            align-items: center;
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .stats-grid {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            margin: 20px 0 26px;
+        }
+
+        .stat-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 14px;
+        }
+
+        .stat-card strong {
+            display: block;
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        }
+
+        .project-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            padding: 15px;
+        }
+
+        .project-topline {
+            align-items: flex-start;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .badge-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 8px 0 12px;
+        }
+
+        .badge {
+            background: #eef2ff;
+            border-radius: 999px;
+            color: #3730a3;
+            display: inline-flex;
+            font-size: 13px;
+            padding: 5px 10px;
+        }
+
+        .badge.priority-high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge.status-completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .project-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .edit-form {
+            display: grid;
+            gap: 10px;
+            margin-top: 14px;
+        }
+    </style>
+</head>
+<body>
+
+
+<div class="dashboard-header">
+    <h1>🚀 My Projects</h1>
+    <a href="/logout">Logout</a>
+</div>
+
+<section class="stats-grid">
+    <div class="stat-card">
+        <strong><%= stats.total %></strong>
+        <span>Total Projects</span>
+    </div>
+
+    <div class="stat-card">
+        <strong><%= stats.inProgress %></strong>
+        <span>In Progress</span>
+    </div>
+
+    <div class="stat-card">
+        <strong><%= stats.completed %></strong>
+        <span>Completed</span>
+    </div>
+
+    <div class="stat-card">
+        <strong><%= stats.highPriority %></strong>
+        <span>High Priority</span>
+    </div>
+</section>
+
+<hr>
+
+<h2>Create New Project</h2>
+
+<form method="POST" action="/project" style="margin-bottom:30px;">
+
+    <div style="margin-bottom:10px;">
+        <input
+            type="text"
+            name="title"
+            placeholder="Project Title"
+            required
+        >
+    </div>
+
+    <div style="margin-bottom:10px;">
+        <textarea
+            name="description"
+            placeholder="Project Description"
+            rows="4"
+            required
+        ></textarea>
+    </div>
+
+    <div class="form-grid" style="margin-bottom:10px;">
+        <select name="status">
+            <option value="Planned">Planned</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+        </select>
+
+        <select name="priority">
+            <option value="Low">Low Priority</option>
+            <option value="Medium" selected>Medium Priority</option>
+            <option value="High">High Priority</option>
+        </select>
+
+        <input
+            type="date"
+            name="dueDate"
+        >
+    </div>
+
+    <button
+        type="submit"
+        class="primary-button"
+    >
+        Create Project
+    </button>
+
+</form>
+
+<hr>
+
+<h2>Project List</h2>
+
+<% if(projects.length === 0){ %>
+
+    <p>No projects found.</p>
+
+<% } else { %>
+
+    <% projects.forEach(project => { %>
+
+        <div class="project-card">
+
+            <div class="project-topline">
+                <h3><%= project.title %></h3>
+                <% if(project.dueDate){ %>
+                    <span class="badge">
+                        Due <%= project.dueDate.toISOString().slice(0, 10) %>
+                    </span>
+                <% } %>
+            </div>
+
+            <div class="badge-row">
+                <span class="badge <%= project.status === 'Completed' ? 'status-completed' : '' %>">
+                    <%= project.status || 'Planned' %>
+                </span>
+                <span class="badge <%= project.priority === 'High' ? 'priority-high' : '' %>">
+                    <%= project.priority || 'Medium' %> Priority
+                </span>
+            </div>
+
+            <p><%= project.description %></p>
+
+            <form
+                class="edit-form"
+                method="POST"
+                action="/project/edit/<%= project._id %>"
+            >
+                <input
+                    type="text"
+                    name="title"
+                    value="<%= project.title %>"
+                    required
+                >
+
+                <textarea
+                    name="description"
+                    rows="3"
+                    required
+                ><%= project.description %></textarea>
+
+                <div class="form-grid">
+                    <select name="status">
+                        <option value="Planned" <%= project.status === 'Planned' ? 'selected' : '' %>>Planned</option>
+                        <option value="In Progress" <%= project.status === 'In Progress' ? 'selected' : '' %>>In Progress</option>
+                        <option value="Completed" <%= project.status === 'Completed' ? 'selected' : '' %>>Completed</option>
+                    </select>
+
+                    <select name="priority">
+                        <option value="Low" <%= project.priority === 'Low' ? 'selected' : '' %>>Low Priority</option>
+                        <option value="Medium" <%= project.priority === 'Medium' ? 'selected' : '' %>>Medium Priority</option>
+                        <option value="High" <%= project.priority === 'High' ? 'selected' : '' %>>High Priority</option>
+                    </select>
+
+                    <input
+                        type="date"
+                        name="dueDate"
+                        value="<%= project.dueDate ? project.dueDate.toISOString().slice(0, 10) : '' %>"
+                    >
+                </div>
+
+                <div class="project-actions">
+                    <button class="primary-button" type="submit">Update Project</button>
+                </div>
+            </form>
+
+            <form
+                class="project-actions"
+                method="POST"
+                action="/project/delete/<%= project._id %>"
+                onsubmit="return confirm('Delete this project?');"
+            >
+                <button class="danger-button" type="submit">Delete Project</button>
+            </form>
+
+        </div>
+
+    <% }) %>
+
+<% } %>
+
+
+</body>
+</html>
