@@ -4,6 +4,10 @@ const router = express.Router();
 
 const authController = require("../Controller/authController");
 
+router.get("/", (req, res) => {
+  res.redirect("/login");
+});
+
 router.get("/register", authController.getRegister);
 
 router.post("/register", authController.postRegister);
